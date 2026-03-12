@@ -6,91 +6,277 @@
 <title>Gurov</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
-:root{--bg:#0f0f11;--fg:#e6e6e6;--mu:#9a9a9a;--ac:#7aa2f7;--ach:#9db4f9;--bd:#2a2a2e;--cbg:#16161a}
-@media(prefers-color-scheme:light){:root{--bg:#fafafa;--fg:#1a1a1a;--mu:#5a5a5a;--ac:#2962ff;--ach:#4479ff;--bd:#e0e0e0;--cbg:#ffffff}}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--fg);line-height:1.6;padding:clamp(1.25rem,5vw,2rem) clamp(1rem,4vw,1.5rem);max-width:720px;margin:0 auto;font-size:clamp(.9rem,2.5vw,.95rem);min-height:100vh;display:flex;flex-direction:column}
-header{padding-bottom:clamp(1rem,4vw,1.5rem);border-bottom:1px solid var(--bd);margin-bottom:clamp(1.5rem,5vw,2rem)}
-h1{font-size:clamp(1.2rem,5vw,1.4rem);font-weight:600;letter-spacing:-.02em}
-nav{display:flex;flex-wrap:wrap;gap:.75rem 1.25rem;margin-top:clamp(.75rem,3vw,1rem);font-size:clamp(.85rem,2.5vw,.9rem)}
-nav a{color:var(--mu);text-decoration:none;transition:color .15s ease;position:relative;padding:.25rem 0;display:inline-flex;align-items:center;gap:.2em}
-nav a:hover,nav a:active{color:var(--ac)}
-nav a::after{content:"";position:absolute;bottom:.25rem;left:0;width:0;height:1px;background:var(--ac);transition:width .2s ease}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden}
+body{font-family:'Space Grotesk',sans-serif;background:#0a0e27}
+
+#webGLApp{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1}
+
+.site{position:fixed;top:0;left:0;width:100%;height:100%;z-index:10;overflow-y:auto;display:flex;flex-direction:column}
+.inner{max-width:740px;margin:0 auto;width:100%;padding:clamp(1.5rem,5vw,2.5rem) clamp(1rem,4vw,1.5rem);flex:1;display:flex;flex-direction:column}
+
+.card{background:rgba(0,0,0,0.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:clamp(1.5rem,5vw,2.25rem);color:#e6e6e6;flex:1}
+
+header{padding-bottom:1.25rem;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:1.75rem}
+h1{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,5vw,2rem);font-weight:800;color:#fff;letter-spacing:-.02em}
+nav{display:flex;flex-wrap:wrap;gap:.6rem 1.25rem;margin-top:.85rem;font-size:.9rem}
+nav a{color:rgba(255,255,255,0.45);text-decoration:none;transition:color .15s;position:relative;padding:.2rem 0;font-weight:500}
+nav a::after{content:"";position:absolute;bottom:.2rem;left:0;width:0;height:1px;background:#F15A22;transition:width .2s}
+nav a:hover{color:#F15A22}
 nav a:hover::after{width:100%}
-main{flex:1}
-section{margin-bottom:clamp(1.75rem,6vw,2.25rem);padding-left:.25rem}
-h2{font-size:clamp(1rem,4vw,1.1rem);font-weight:500;margin-bottom:.85rem;color:var(--fg);letter-spacing:-.01em}
-p{margin-bottom:.75rem;color:var(--fg)}
-ul{list-style:none;padding-left:.25rem}
-li{margin-bottom:.9rem;padding-left:.25rem}
-.proj{display:flex;flex-direction:column;gap:.25rem}
-.proj a{color:var(--ac);text-decoration:none;font-weight:500;transition:color .15s ease;display:inline-flex;align-items:center}
-.proj a:hover{color:var(--ach)}
-.proj .dsc{color:var(--mu);font-size:clamp(.88rem,2.5vw,.92rem);margin-left:.1rem;line-height:1.5}
-.tag{font-style:italic;color:var(--mu);margin-top:.4rem;font-size:clamp(.85rem,2.5vw,.9rem)}
-.pmt{display:inline-flex;align-items:center;gap:.4rem;color:var(--mu);font-size:clamp(.85rem,2.5vw,.9rem);margin-top:.5rem}
-.pmt .arr{color:var(--ac);font-weight:500}
-footer{margin-top:auto;padding-top:clamp(1rem,4vw,1.25rem);border-top:1px solid var(--bd);color:var(--mu);font-size:clamp(.8rem,2.5vw,.85rem);display:flex;flex-direction:column;gap:1rem}
-.frow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem}
-.flnk{text-align:right;flex:1;min-width:280px}
-.flnk div{margin-bottom:.35rem}
-.flnk a{color:var(--ac);text-decoration:none}
-.soc{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:flex-end}
-.soc a{color:var(--mu);text-decoration:none;font-size:clamp(.85rem,2.5vw,.9rem);padding:.35rem .65rem;border:1px solid var(--bd);border-radius:4px;transition:all .15s ease;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
-.soc a:hover{border-color:var(--ac);color:var(--ac);background:var(--cbg)}
-@media(max-width:480px){.frow{flex-direction:column;align-items:flex-start}.flnk{text-align:left;width:100%}.soc{justify-content:flex-start}}
+
+section{margin-bottom:1.75rem}
+h2{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:600;margin-bottom:.9rem;color:rgba(255,255,255,0.4);letter-spacing:.1em;text-transform:uppercase}
+p{margin-bottom:.7rem;color:rgba(255,255,255,0.75);font-size:.93rem;line-height:1.7;font-weight:400}
+
+ul{list-style:none}
+li{margin-bottom:1rem}
+.proj{display:flex;flex-direction:column;gap:.3rem}
+.proj a{color:#F15A22;text-decoration:none;font-weight:600;font-size:.95rem;transition:color .15s;display:inline-flex;align-items:center;gap:.25rem;font-family:'Syne',sans-serif}
+.proj a:hover{color:#ff7a47}
+.proj .dsc{color:rgba(255,255,255,0.45);font-size:.88rem;line-height:1.55}
+.tag{font-style:italic;color:rgba(255,255,255,0.3);font-size:.875rem;margin-top:.5rem}
+
+footer{padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3);font-size:.8rem}
+.frow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem;margin-bottom:.85rem}
+.flnk a{color:#F15A22;text-decoration:none}
+.soc{display:flex;flex-wrap:wrap;gap:.5rem}
+.soc a{color:rgba(255,255,255,0.4);text-decoration:none;font-size:.82rem;padding:.3rem .7rem;border:1px solid rgba(255,255,255,0.12);border-radius:6px;transition:all .15s;display:inline-flex;align-items:center;font-family:'Syne',sans-serif;font-weight:500;letter-spacing:.03em}
+.soc a:hover{border-color:#F15A22;color:#F15A22;background:rgba(241,90,34,0.08)}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
-::selection{background:var(--ac);color:var(--bg)}
-a:focus-visible{outline:2px solid var(--ac);outline-offset:2px;border-radius:2px}
 </style>
 </head>
 <body>
-<header>
-<h1>Gurov</h1>
-<nav>
-<a href="#about">about</a>
-<a href="#projects">projects</a>
-</nav>
-</header>
-<main>
-<section id="about">
-<h2>about</h2>
-<p>From Kyiv, Ukraine. Hobbyist programmer and FOSS enthusiast.</p>
-<p>Bodybuilding for 2+ years, recently got into arm wrestling (left hand, open style).</p>
-<p>Into rap — mostly 2010s trap, but also experimental hip hop and rap rock.</p>
-</section>
-<section id="projects">
-<h2>projects</h2>
-<ul>
-<li class="proj">
-<a href="https://github.com/Gur0v/zeptofetch" target="_blank" rel="noopener">zeptofetch ↗</a>
-<span class="dsc">Blazingly fast, ultra-minimal system information tool for Linux.</span>
-</li>
-<li class="proj">
-<a href="https://github.com/Gur0v/archie-ng" target="_blank" rel="noopener">archie-ng ↗</a>
-<span class="dsc">Even faster & easier package management for Arch Linux.</span>
-</li>
-</ul>
-<p class="tag">I use Arch, btw.</p>
-<div class="pmt"><span class="arr">~</span><span>❯</span></div>
-</section>
-</main>
-<footer>
-<div class="frow">
-<span>2026-03-03</span>
-<div class="flnk">
-<div>No trackers. No JavaScript. Just HTML + CSS.</div>
-<div>Source under <a href="https://www.gnu.org/licenses/gpl-3.0.html">GPLv3</a> &bull; <a href="https://github.com/Gur0v/gur0v.github.io">github.com/Gur0v/gur0v.github.io</a></div>
+
+<canvas id="webGLApp"></canvas>
+
+<div class="site">
+  <div class="inner">
+    <div class="card">
+      <header>
+        <h1>Gurov</h1>
+
+      </header>
+      <main>
+        <section id="about">
+          <h2>about</h2>
+          <p>From Kyiv, Ukraine. Hobbyist programmer and FOSS enthusiast.</p>
+          <p>Bodybuilding for 2+ years, recently got into arm wrestling (left hand, open style).</p>
+          <p>Into rap — mostly 2010s trap, but also experimental hip hop and rap rock.</p>
+        </section>
+        <section id="projects">
+          <h2>projects</h2>
+          <ul>
+            <li class="proj">
+              <a href="https://github.com/Gur0v/zeptofetch" target="_blank" rel="noopener">zeptofetch ↗</a>
+              <span class="dsc">Blazingly fast, ultra-minimal system information tool for Linux.</span>
+            </li>
+            <li class="proj">
+              <a href="https://github.com/Gur0v/archie-ng" target="_blank" rel="noopener">archie-ng ↗</a>
+              <span class="dsc">Even faster & easier package management for Arch Linux.</span>
+            </li>
+          </ul>
+          <p class="tag">I use Gentoo, btw.</p>
+        </section>
+      </main>
+      <footer>
+        <div class="frow">
+          <span>2026-12-03</span>
+          <span>Source under <a href="https://github.com/Gur0v/gur0v.github.io">GPLv3</a></span>
+        </div>
+        <div class="soc">
+          <a href="https://github.com/Gur0v" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://www.last.fm/user/gur0v" target="_blank" rel="noopener">Last.fm</a>
+          <a href="https://discord.com/users/507198451998523392" target="_blank" rel="noopener">Discord</a>
+        </div>
+      </footer>
+    </div>
+  </div>
 </div>
-</div>
-<div class="soc">
-<a href="https://github.com/Gur0v" target="_blank" rel="noopener">GitHub</a>
-<a href="https://www.last.fm/user/gur0v" target="_blank" rel="noopener">Last.fm</a>
-<a href="https://discord.com/users/507198451998523392" target="_blank" rel="noopener">Discord</a>
-</div>
-</footer>
+
+<script>
+class TouchTexture {
+  constructor() {
+    this.size=64; this.maxAge=64; this.radius=0.25*64;
+    this.speed=1/64; this.trail=[]; this.last=null;
+    this.canvas=document.createElement('canvas');
+    this.canvas.width=this.canvas.height=64;
+    this.ctx=this.canvas.getContext('2d');
+    this.ctx.fillStyle='black'; this.ctx.fillRect(0,0,64,64);
+    this.texture=new THREE.Texture(this.canvas);
+  }
+  update(){
+    this.ctx.fillStyle='black'; this.ctx.fillRect(0,0,64,64);
+    for(let i=this.trail.length-1;i>=0;i--){
+      const p=this.trail[i];
+      let f=p.force*this.speed*(1-p.age/this.maxAge);
+      p.x+=p.vx*f; p.y+=p.vy*f; p.age++;
+      if(p.age>this.maxAge) this.trail.splice(i,1); else this._draw(p);
+    }
+    this.texture.needsUpdate=true;
+  }
+  addTouch(pt){
+    let vx=0,vy=0,force=0;
+    if(this.last){
+      const dx=pt.x-this.last.x, dy=pt.y-this.last.y;
+      if(!dx&&!dy) return;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      vx=dx/d; vy=dy/d; force=Math.min((dx*dx+dy*dy)*20000,2);
+    }
+    this.last={x:pt.x,y:pt.y};
+    this.trail.push({x:pt.x,y:pt.y,age:0,force,vx,vy});
+  }
+  _draw(p){
+    const s=64, x=p.x*s, y=(1-p.y)*s, off=s*5, r=this.radius;
+    let intensity=p.age<this.maxAge*.3
+      ? Math.sin((p.age/(this.maxAge*.3))*(Math.PI/2))
+      : Math.max(0,1-(p.age-this.maxAge*.3)/(this.maxAge*.7));
+    intensity*=p.force;
+    const col=`${((p.vx+1)/2)*255},${((p.vy+1)/2)*255},${intensity*255}`;
+    this.ctx.shadowOffsetX=off; this.ctx.shadowOffsetY=off;
+    this.ctx.shadowBlur=r; this.ctx.shadowColor=`rgba(${col},${0.2*intensity})`;
+    this.ctx.beginPath(); this.ctx.fillStyle='rgba(255,0,0,1)';
+    this.ctx.arc(x-off,y-off,r,0,Math.PI*2); this.ctx.fill();
+  }
+}
+
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('webGLApp'),antialias:true,alpha:false,stencil:false,depth:false});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+
+const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,10000);
+camera.position.z=50;
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0a0e27);
+const clock=new THREE.Clock();
+const touch=new TouchTexture();
+
+function getViewSize(){
+  const fov=(camera.fov*Math.PI)/180;
+  const h=Math.abs(camera.position.z*Math.tan(fov/2)*2);
+  return{width:h*camera.aspect,height:h};
+}
+
+const C={
+  orange:new THREE.Vector3(0.945,0.353,0.133),
+  teal:new THREE.Vector3(0.0,0.259,0.22),
+  black:new THREE.Vector3(0,0,0)
+};
+
+const uniforms={
+  uTime:{value:0},uResolution:{value:new THREE.Vector2(innerWidth,innerHeight)},
+  uC1:{value:C.orange},uC2:{value:C.teal},
+  uC3:{value:C.orange},uC4:{value:C.black},
+  uC5:{value:C.orange},uC6:{value:C.black},
+  uTouch:{value:touch.texture},
+  uSpeed:{value:1.5},uIntensity:{value:1.8},uGrain:{value:0.08},
+  uBase:{value:new THREE.Vector3(0.039,0.055,0.153)},
+  uGradSize:{value:0.45},uGradCount:{value:12.0},uW1:{value:0.5},uW2:{value:1.8}
+};
+
+const vs=`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`;
+
+const fs=`
+uniform float uTime;uniform vec2 uResolution;
+uniform vec3 uC1,uC2,uC3,uC4,uC5,uC6,uBase;
+uniform float uSpeed,uIntensity,uGrain,uGradSize,uGradCount,uW1,uW2;
+uniform sampler2D uTouch;
+varying vec2 vUv;
+float grain(vec2 uv,float t){vec2 g=uv*uResolution*.5;return fract(sin(dot(g+t,vec2(12.9898,78.233)))*43758.5453)*2.-1.;}
+vec3 gradient(vec2 uv,float t){
+  float r=uGradSize;
+  vec2 c1=vec2(.5+sin(t*uSpeed*.4)*.4,.5+cos(t*uSpeed*.5)*.4);
+  vec2 c2=vec2(.5+cos(t*uSpeed*.6)*.5,.5+sin(t*uSpeed*.45)*.5);
+  vec2 c3=vec2(.5+sin(t*uSpeed*.35)*.45,.5+cos(t*uSpeed*.55)*.45);
+  vec2 c4=vec2(.5+cos(t*uSpeed*.5)*.4,.5+sin(t*uSpeed*.4)*.4);
+  vec2 c5=vec2(.5+sin(t*uSpeed*.7)*.35,.5+cos(t*uSpeed*.6)*.35);
+  vec2 c6=vec2(.5+cos(t*uSpeed*.45)*.5,.5+sin(t*uSpeed*.65)*.5);
+  vec2 c7=vec2(.5+sin(t*uSpeed*.55)*.38,.5+cos(t*uSpeed*.48)*.42);
+  vec2 c8=vec2(.5+cos(t*uSpeed*.65)*.36,.5+sin(t*uSpeed*.52)*.44);
+  vec2 c9=vec2(.5+sin(t*uSpeed*.42)*.41,.5+cos(t*uSpeed*.58)*.39);
+  vec2 c10=vec2(.5+cos(t*uSpeed*.48)*.37,.5+sin(t*uSpeed*.62)*.43);
+  float i1=1.-smoothstep(0.,r,length(uv-c1));
+  float i2=1.-smoothstep(0.,r,length(uv-c2));
+  float i3=1.-smoothstep(0.,r,length(uv-c3));
+  float i4=1.-smoothstep(0.,r,length(uv-c4));
+  float i5=1.-smoothstep(0.,r,length(uv-c5));
+  float i6=1.-smoothstep(0.,r,length(uv-c6));
+  float i7=1.-smoothstep(0.,r,length(uv-c7));
+  float i8=1.-smoothstep(0.,r,length(uv-c8));
+  float i9=1.-smoothstep(0.,r,length(uv-c9));
+  float i10=1.-smoothstep(0.,r,length(uv-c10));
+  vec2 rv1=uv-.5;float a1=t*uSpeed*.15;
+  rv1=vec2(rv1.x*cos(a1)-rv1.y*sin(a1),rv1.x*sin(a1)+rv1.y*cos(a1))+.5;
+  vec2 rv2=uv-.5;float a2=-t*uSpeed*.12;
+  rv2=vec2(rv2.x*cos(a2)-rv2.y*sin(a2),rv2.x*sin(a2)+rv2.y*cos(a2))+.5;
+  float ri1=1.-smoothstep(0.,.8,length(rv1-.5));
+  float ri2=1.-smoothstep(0.,.8,length(rv2-.5));
+  vec3 col=vec3(0.);
+  col+=uC1*i1*(.55+.45*sin(t*uSpeed))*uW1;
+  col+=uC2*i2*(.55+.45*cos(t*uSpeed*1.2))*uW2;
+  col+=uC3*i3*(.55+.45*sin(t*uSpeed*.8))*uW1;
+  col+=uC4*i4*(.55+.45*cos(t*uSpeed*1.3))*uW2;
+  col+=uC5*i5*(.55+.45*sin(t*uSpeed*1.1))*uW1;
+  col+=uC6*i6*(.55+.45*cos(t*uSpeed*.9))*uW2;
+  col+=uC1*i7*(.55+.45*sin(t*uSpeed*1.4))*uW1;
+  col+=uC2*i8*(.55+.45*cos(t*uSpeed*1.5))*uW2;
+  col+=uC3*i9*(.55+.45*sin(t*uSpeed*1.6))*uW1;
+  col+=uC4*i10*(.55+.45*cos(t*uSpeed*1.7))*uW2;
+  col+=mix(uC1,uC3,ri1)*.45*uW1;
+  col+=mix(uC2,uC4,ri2)*.4*uW2;
+  col=clamp(col,0.,1.)*uIntensity;
+  float lum=dot(col,vec3(.299,.587,.114));
+  col=mix(vec3(lum),col,1.35);
+  col=pow(col,vec3(.92));
+  float br=length(col);col=mix(uBase,col,max(br*1.2,.15));
+  br=length(col);if(br>1.)col*=1./br;
+  return col;
+}
+void main(){
+  vec2 uv=vUv;
+  vec4 tt=texture2D(uTouch,uv);
+  float vx=-(tt.r*2.-1.),vy=-(tt.g*2.-1.),ins=tt.b;
+  uv.x+=vx*.8*ins;uv.y+=vy*.8*ins;
+  float d=length(uv-.5);
+  uv+=vec2(sin(d*20.-uTime*3.)*.04*ins+sin(d*15.-uTime*2.)*.03*ins);
+  vec3 col=gradient(uv,uTime);
+  col+=grain(uv,uTime)*uGrain;
+  float ts=uTime*.5;
+  col.r+=sin(ts)*.02;col.g+=cos(ts*1.4)*.02;col.b+=sin(ts*1.2)*.02;
+  float br2=length(col);col=mix(uBase,col,max(br2*1.2,.15));
+  col=clamp(col,0.,1.);
+  float br3=length(col);if(br3>1.)col*=1./br3;
+  gl_FragColor=vec4(col,1.);
+}`;
+
+const geo=new THREE.PlaneGeometry(2,2);
+const mat=new THREE.ShaderMaterial({uniforms,vertexShader:vs,fragmentShader:fs});
+const mesh=new THREE.Mesh(geo,mat);
+scene.add(mesh);
+
+function tick(){
+  const delta=Math.min(clock.getDelta(),0.1);
+  touch.update();
+  uniforms.uTime.value+=delta;
+  renderer.render(scene,camera);
+  requestAnimationFrame(tick);
+}
+tick();
+
+window.addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+  uniforms.uResolution.value.set(innerWidth,innerHeight);
+  mesh.geometry.dispose();
+  mesh.geometry=new THREE.PlaneGeometry(2,2);
+});
+window.addEventListener('mousemove',e=>{touch.addTouch({x:e.clientX/innerWidth,y:1-e.clientY/innerHeight});});
+window.addEventListener('touchmove',e=>{const t=e.touches[0];touch.addTouch({x:t.clientX/innerWidth,y:1-t.clientY/innerHeight});},{passive:true});
+</script>
 </body>
 </html>
