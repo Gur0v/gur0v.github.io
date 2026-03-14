@@ -278,5 +278,82 @@ window.addEventListener('resize',()=>{
 window.addEventListener('mousemove',e=>{touch.addTouch({x:e.clientX/innerWidth,y:1-e.clientY/innerHeight});});
 window.addEventListener('touchmove',e=>{const t=e.touches[0];touch.addTouch({x:t.clientX/innerWidth,y:1-t.clientY/innerHeight});},{passive:true});
 </script>
+<style>
+#petition-popup {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  max-width: 300px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  color: rgba(255,255,255,0.75);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .88rem;
+  line-height: 1.55;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .35s ease, transform .35s ease;
+  pointer-events: none;
+}
+#petition-popup.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+#petition-popup strong {
+  display: block;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: .92rem;
+  color: #fff;
+  margin-bottom: .35rem;
+}
+#petition-popup a.btn {
+  display: inline-block;
+  margin-top: .65rem;
+  color: #F15A22;
+  text-decoration: none;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: .85rem;
+  border: 1px solid rgba(241,90,34,0.45);
+  border-radius: 6px;
+  padding: .3rem .75rem;
+  transition: background .15s, border-color .15s;
+}
+#petition-popup a.btn:hover {
+  background: rgba(241,90,34,0.12);
+  border-color: #F15A22;
+}
+#petition-popup button.close {
+  position: absolute;
+  top: .55rem;
+  right: .65rem;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.3);
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  transition: color .15s;
+}
+#petition-popup button.close:hover { color: #fff; }
+</style>
+
+<div id="petition-popup">
+  <button class="close" onclick="this.parentElement.classList.remove('show')" aria-label="Dismiss">&times;</button>
+  <strong>Stop Google restricting APKs</strong>
+  Keep sideloading free and open. <a class="btn" href="https://c.org/vYQKRTkxcJ" target="_blank" rel="noopener">Sign now ↗</a>
+</div>
+
+<script>
+setTimeout(() => document.getElementById('petition-popup').classList.add('show'), 4000);
+</script>
 </body>
 </html>
