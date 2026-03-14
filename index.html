@@ -47,6 +47,9 @@ footer{padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.08);color:rgb
 .soc a{color:rgba(255,255,255,0.4);text-decoration:none;font-size:.82rem;padding:.3rem .7rem;border:1px solid rgba(255,255,255,0.12);border-radius:6px;transition:all .15s;font-family:'Syne',sans-serif;font-weight:500;letter-spacing:.03em}
 .soc a:hover{border-color:#F15A22;color:#F15A22;background:rgba(241,90,34,0.08)}
 
+#commit-info a{color:inherit;text-decoration:none}
+#commit-info a:hover{color:#F15A22}
+
 #popup{
   display:none;position:fixed;z-index:20;width:280px;
   background:rgba(0,0,0,0.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
@@ -107,7 +110,7 @@ footer{padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.08);color:rgb
       </main>
       <footer>
         <div class="frow">
-          <span>2026-12-03</span>
+          <span id="commit-info">…</span>
           <span>Source under <a href="https://github.com/Gur0v/gur0v.github.io">AGPL-3.0</a></span>
         </div>
         <div class="soc">
@@ -374,6 +377,19 @@ if (innerWidth > 1024 && !('ontouchstart' in window)) {
     if (popup.style.display !== 'none') popup.classList.add('show');
   }, 4000);
 }
+
+fetch('https://api.github.com/repos/Gur0v/gur0v.github.io/commits?per_page=1')
+  .then(r => r.json())
+  .then(data => {
+    const c = data[0];
+    const sha = c.sha.slice(0, 7);
+    const date = new Date(c.commit.author.date).toISOString().slice(0, 10);
+    const el = $('commit-info');
+    el.innerHTML = `<a href="${c.html_url}" target="_blank" rel="noopener" title="${c.commit.message.split('\n')[0]}">${sha}</a> · ${date}`;
+  })
+  .catch(() => {
+    $('commit-info').textContent = 'unknown';
+  });
 </script>
 </body>
 </html>
