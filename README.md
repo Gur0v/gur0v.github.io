@@ -1,12 +1,14 @@
 # gur0v.github.io
 
-Personal site. Single HTML file with a WebGL animated background and no dependencies beyond Three.js.
+Personal site. Single HTML file with a WebGL animated background.
 
 ## Stack
 
-- **Three.js r128** — GLSL gradient shader with touch/mouse interaction
-- **Google Fonts** — Space Grotesk + Syne
-- Hosted on **GitHub Pages**, proxied through **Cloudflare**
+| Layer | Detail |
+|---|---|
+| Renderer | Three.js r128 — GLSL gradient shader with mouse/touch interaction |
+| Fonts | Space Grotesk + Syne via Google Fonts |
+| Hosting | GitHub Pages, proxied through Cloudflare |
 
 ## License
 
