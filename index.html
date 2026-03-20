@@ -40,6 +40,11 @@ li{margin-bottom:1rem}
 .proj .dsc{color:rgba(255,255,255,0.45);font-size:.88rem;line-height:1.55}
 .tag{font-style:italic;color:rgba(255,255,255,0.3);font-size:.875rem;margin-top:.5rem}
 
+.uses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.6rem}
+.uses-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:.65rem .85rem;display:flex;flex-direction:column;gap:.2rem}
+.uses-item .uses-label{font-size:.75rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:.08em;font-family:'Syne',sans-serif;font-weight:600}
+.uses-item .uses-val{font-size:.9rem;color:rgba(255,255,255,0.8);font-weight:500}
+
 footer{padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3);font-size:.8rem}
 .frow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem;margin-bottom:.85rem}
 .frow a{color:#F15A22;text-decoration:none}
@@ -105,7 +110,35 @@ footer{padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.08);color:rgb
               <span class="dsc">Even faster & easier package management for Arch Linux.</span>
             </li>
           </ul>
-          <p class="tag">I use Arch, btw.</p>
+        </section>
+        <section id="uses">
+          <h2>uses</h2>
+          <div class="uses-grid">
+            <div class="uses-item">
+              <span class="uses-label">CPU</span>
+              <span class="uses-val">AMD Ryzen 5 5600</span>
+            </div>
+            <div class="uses-item">
+              <span class="uses-label">GPU</span>
+              <span class="uses-val">AMD Radeon RX 7600</span>
+            </div>
+            <div class="uses-item">
+              <span class="uses-label">Motherboard</span>
+              <span class="uses-val">MSI B550-A PRO</span>
+            </div>
+            <div class="uses-item">
+              <span class="uses-label">Memory</span>
+              <span class="uses-val">32GB DDR4 @ 3200</span>
+            </div>
+            <div class="uses-item">
+              <span class="uses-label">OS</span>
+              <span class="uses-val">Arch Linux</span>
+            </div>
+            <div class="uses-item">
+              <span class="uses-label">Desktop</span>
+              <span class="uses-val">Xfce (Xlibre)</span>
+            </div>
+          </div>
         </section>
       </main>
       <footer>
