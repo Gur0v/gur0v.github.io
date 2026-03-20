@@ -78,6 +78,24 @@ footer{padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.08);color:rgb
 }
 #popup .close:hover{color:#fff}
 
+#scrollTop{
+  position:fixed;bottom:1.5rem;right:1.5rem;z-index:30;
+  width:42px;height:42px;
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:50%;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transform:translateY(10px);
+  transition:opacity .3s ease, transform .3s ease, border-color .15s, background .15s;
+}
+#scrollTop.visible{opacity:1;pointer-events:auto;transform:translateY(0)}
+#scrollTop:hover{border-color:#F15A22;background:rgba(241,90,34,0.15)}
+#scrollTop svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
+#scrollTop:hover svg{stroke:#F15A22}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -85,7 +103,7 @@ footer{padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.08);color:rgb
 
 <canvas id="webGLApp"></canvas>
 
-<div class="site">
+<div class="site" id="scrollContainer">
   <div class="inner">
     <div class="card">
       <header>
@@ -156,6 +174,13 @@ footer{padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.08);color:rgb
   </div>
 </div>
 
+<!-- Scroll-to-top button -->
+<button id="scrollTop" aria-label="Scroll to top">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <polyline points="18 15 12 9 6 15"/>
+  </svg>
+</button>
+
 <div id="popup">
   <button class="close" onclick="this.parentElement.classList.remove('show')" aria-label="Dismiss">&times;</button>
   <strong>Stop Google restricting APKs</strong>
@@ -168,261 +193,173 @@ const $ = id => document.getElementById(id);
 
 class TouchTexture {
   constructor() {
-    this.maxAge = 64;
-    this.radius = 16;
-    this.speed = 1 / 64;
-    this.trail = [];
-    this.last = null;
-    this.canvas = Object.assign(document.createElement('canvas'), {width:64, height:64});
+    this.maxAge = 64; this.radius = 16; this.speed = 1/64;
+    this.trail = []; this.last = null;
+    this.canvas = Object.assign(document.createElement('canvas'), {width:64,height:64});
     this.ctx = this.canvas.getContext('2d');
     this.ctx.fillStyle = 'black';
-    this.ctx.fillRect(0, 0, 64, 64);
+    this.ctx.fillRect(0,0,64,64);
     this.texture = new THREE.Texture(this.canvas);
   }
-
   addTouch(pt) {
-    let vx = 0, vy = 0, force = 0;
+    let vx=0,vy=0,force=0;
     if (this.last) {
-      const dx = pt.x - this.last.x, dy = pt.y - this.last.y;
-      if (!dx && !dy) return;
-      const d = Math.sqrt(dx*dx + dy*dy);
-      vx = dx/d; vy = dy/d;
-      force = Math.min((dx*dx + dy*dy) * 20000, 2);
+      const dx=pt.x-this.last.x, dy=pt.y-this.last.y;
+      if (!dx&&!dy) return;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      vx=dx/d; vy=dy/d;
+      force=Math.min((dx*dx+dy*dy)*20000,2);
     }
-    this.last = {x: pt.x, y: pt.y};
-    this.trail.push({x: pt.x, y: pt.y, age: 0, force, vx, vy});
+    this.last={x:pt.x,y:pt.y};
+    this.trail.push({x:pt.x,y:pt.y,age:0,force,vx,vy});
   }
-
   update() {
-    this.ctx.fillStyle = 'black';
-    this.ctx.fillRect(0, 0, 64, 64);
-    for (let i = this.trail.length - 1; i >= 0; i--) {
-      const p = this.trail[i];
-      const f = p.force * this.speed * (1 - p.age / this.maxAge);
-      p.x += p.vx * f;
-      p.y += p.vy * f;
-      p.age++;
-      if (p.age > this.maxAge) this.trail.splice(i, 1);
+    this.ctx.fillStyle='black';
+    this.ctx.fillRect(0,0,64,64);
+    for (let i=this.trail.length-1;i>=0;i--) {
+      const p=this.trail[i];
+      const f=p.force*this.speed*(1-p.age/this.maxAge);
+      p.x+=p.vx*f; p.y+=p.vy*f; p.age++;
+      if (p.age>this.maxAge) this.trail.splice(i,1);
       else this._drawPoint(p);
     }
-    this.texture.needsUpdate = true;
+    this.texture.needsUpdate=true;
   }
-
   _drawPoint(p) {
-    const s = 64, x = p.x * s, y = (1 - p.y) * s, off = s * 5, r = this.radius;
-    const t = p.age / this.maxAge;
-    let intensity = t < 0.3 ? Math.sin((t / 0.3) * (Math.PI / 2)) : Math.max(0, 1 - (t - 0.3) / 0.7);
-    intensity *= p.force;
-    const col = `${((p.vx+1)/2)*255},${((p.vy+1)/2)*255},${intensity*255}`;
-    this.ctx.shadowOffsetX = off;
-    this.ctx.shadowOffsetY = off;
-    this.ctx.shadowBlur = r;
-    this.ctx.shadowColor = `rgba(${col},${0.2 * intensity})`;
+    const s=64,x=p.x*s,y=(1-p.y)*s,off=s*5,r=this.radius;
+    const t=p.age/this.maxAge;
+    let intensity=t<0.3?Math.sin((t/0.3)*(Math.PI/2)):Math.max(0,1-(t-0.3)/0.7);
+    intensity*=p.force;
+    const col=`${((p.vx+1)/2)*255},${((p.vy+1)/2)*255},${intensity*255}`;
+    this.ctx.shadowOffsetX=off; this.ctx.shadowOffsetY=off;
+    this.ctx.shadowBlur=r;
+    this.ctx.shadowColor=`rgba(${col},${0.2*intensity})`;
     this.ctx.beginPath();
-    this.ctx.fillStyle = 'rgba(255,0,0,1)';
-    this.ctx.arc(x - off, y - off, r, 0, Math.PI * 2);
+    this.ctx.fillStyle='rgba(255,0,0,1)';
+    this.ctx.arc(x-off,y-off,r,0,Math.PI*2);
     this.ctx.fill();
   }
 }
 
-const renderer = new THREE.WebGLRenderer({canvas: $('webGLApp'), antialias: true, alpha: false, stencil: false, depth: false});
-renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-
+const renderer = new THREE.WebGLRenderer({canvas:$('webGLApp'),antialias:true,alpha:false,stencil:false,depth:false});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0e27);
-
-const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 10000);
-camera.position.z = 50;
-
+const camera = new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,10000);
+camera.position.z=50;
 const clock = new THREE.Clock();
 const touch = new TouchTexture();
-
-const V3 = (r,g,b) => new THREE.Vector3(r,g,b);
-
-const uniforms = {
-  uTime:       {value: 0},
-  uResolution: {value: new THREE.Vector2(innerWidth, innerHeight)},
-  uTouch:      {value: touch.texture},
-  uC1:         {value: V3(0.945, 0.353, 0.133)},
-  uC2:         {value: V3(0.0,   0.259, 0.22)},
-  uC3:         {value: V3(0.945, 0.353, 0.133)},
-  uC4:         {value: V3(0,     0,     0)},
-  uC5:         {value: V3(0.945, 0.353, 0.133)},
-  uC6:         {value: V3(0,     0,     0)},
-  uBase:       {value: V3(0.039, 0.055, 0.153)},
-  uSpeed:      {value: 1.5},
-  uIntensity:  {value: 1.8},
-  uGrain:      {value: 0.08},
-  uGradSize:   {value: 0.45},
-  uW1:         {value: 0.5},
-  uW2:         {value: 1.8},
+const V3=(r,g,b)=>new THREE.Vector3(r,g,b);
+const uniforms={
+  uTime:{value:0},uResolution:{value:new THREE.Vector2(innerWidth,innerHeight)},
+  uTouch:{value:touch.texture},
+  uC1:{value:V3(0.945,0.353,0.133)},uC2:{value:V3(0,0.259,0.22)},
+  uC3:{value:V3(0.945,0.353,0.133)},uC4:{value:V3(0,0,0)},
+  uC5:{value:V3(0.945,0.353,0.133)},uC6:{value:V3(0,0,0)},
+  uBase:{value:V3(0.039,0.055,0.153)},
+  uSpeed:{value:1.5},uIntensity:{value:1.8},uGrain:{value:0.08},
+  uGradSize:{value:0.45},uW1:{value:0.5},uW2:{value:1.8},
 };
-
-const vertShader = `
-  varying vec2 vUv;
-  void main() { vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }
-`;
-
-const fragShader = `
-  uniform float uTime; uniform vec2 uResolution;
+const vertShader=`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`;
+const fragShader=`
+  uniform float uTime;uniform vec2 uResolution;
   uniform vec3 uC1,uC2,uC3,uC4,uC5,uC6,uBase;
   uniform float uSpeed,uIntensity,uGrain,uGradSize,uW1,uW2;
-  uniform sampler2D uTouch;
-  varying vec2 vUv;
-
-  float grain(vec2 uv, float t) {
-    vec2 g = uv * uResolution * .5;
-    return fract(sin(dot(g + t, vec2(12.9898, 78.233))) * 43758.5453) * 2. - 1.;
+  uniform sampler2D uTouch;varying vec2 vUv;
+  float grain(vec2 uv,float t){vec2 g=uv*uResolution*.5;return fract(sin(dot(g+t,vec2(12.9898,78.233)))*43758.5453)*2.-1.;}
+  vec3 gradient(vec2 uv,float t){
+    float r=uGradSize;
+    vec2 c1=vec2(.5+sin(t*uSpeed*.4)*.4,.5+cos(t*uSpeed*.5)*.4);
+    vec2 c2=vec2(.5+cos(t*uSpeed*.6)*.5,.5+sin(t*uSpeed*.45)*.5);
+    vec2 c3=vec2(.5+sin(t*uSpeed*.35)*.45,.5+cos(t*uSpeed*.55)*.45);
+    vec2 c4=vec2(.5+cos(t*uSpeed*.5)*.4,.5+sin(t*uSpeed*.4)*.4);
+    vec2 c5=vec2(.5+sin(t*uSpeed*.7)*.35,.5+cos(t*uSpeed*.6)*.35);
+    vec2 c6=vec2(.5+cos(t*uSpeed*.45)*.5,.5+sin(t*uSpeed*.65)*.5);
+    vec2 c7=vec2(.5+sin(t*uSpeed*.55)*.38,.5+cos(t*uSpeed*.48)*.42);
+    vec2 c8=vec2(.5+cos(t*uSpeed*.65)*.36,.5+sin(t*uSpeed*.52)*.44);
+    vec2 c9=vec2(.5+sin(t*uSpeed*.42)*.41,.5+cos(t*uSpeed*.58)*.39);
+    vec2 c10=vec2(.5+cos(t*uSpeed*.48)*.37,.5+sin(t*uSpeed*.62)*.43);
+    float i1=1.-smoothstep(0.,r,length(uv-c1));float i2=1.-smoothstep(0.,r,length(uv-c2));
+    float i3=1.-smoothstep(0.,r,length(uv-c3));float i4=1.-smoothstep(0.,r,length(uv-c4));
+    float i5=1.-smoothstep(0.,r,length(uv-c5));float i6=1.-smoothstep(0.,r,length(uv-c6));
+    float i7=1.-smoothstep(0.,r,length(uv-c7));float i8=1.-smoothstep(0.,r,length(uv-c8));
+    float i9=1.-smoothstep(0.,r,length(uv-c9));float i10=1.-smoothstep(0.,r,length(uv-c10));
+    vec2 rv1=uv-.5;float a1=t*uSpeed*.15;
+    rv1=vec2(rv1.x*cos(a1)-rv1.y*sin(a1),rv1.x*sin(a1)+rv1.y*cos(a1))+.5;
+    vec2 rv2=uv-.5;float a2=-t*uSpeed*.12;
+    rv2=vec2(rv2.x*cos(a2)-rv2.y*sin(a2),rv2.x*sin(a2)+rv2.y*cos(a2))+.5;
+    float ri1=1.-smoothstep(0.,.8,length(rv1-.5));float ri2=1.-smoothstep(0.,.8,length(rv2-.5));
+    vec3 col=vec3(0.);
+    col+=uC1*i1*(.55+.45*sin(t*uSpeed))*uW1;col+=uC2*i2*(.55+.45*cos(t*uSpeed*1.2))*uW2;
+    col+=uC3*i3*(.55+.45*sin(t*uSpeed*.8))*uW1;col+=uC4*i4*(.55+.45*cos(t*uSpeed*1.3))*uW2;
+    col+=uC5*i5*(.55+.45*sin(t*uSpeed*1.1))*uW1;col+=uC6*i6*(.55+.45*cos(t*uSpeed*.9))*uW2;
+    col+=uC1*i7*(.55+.45*sin(t*uSpeed*1.4))*uW1;col+=uC2*i8*(.55+.45*cos(t*uSpeed*1.5))*uW2;
+    col+=uC3*i9*(.55+.45*sin(t*uSpeed*1.6))*uW1;col+=uC4*i10*(.55+.45*cos(t*uSpeed*1.7))*uW2;
+    col+=mix(uC1,uC3,ri1)*.45*uW1;col+=mix(uC2,uC4,ri2)*.4*uW2;
+    col=clamp(col,0.,1.)*uIntensity;
+    float lum=dot(col,vec3(.299,.587,.114));col=mix(vec3(lum),col,1.35);
+    col=pow(col,vec3(.92));float br=length(col);col=mix(uBase,col,max(br*1.2,.15));
+    br=length(col);if(br>1.)col*=1./br;return col;
   }
-
-  vec3 gradient(vec2 uv, float t) {
-    float r = uGradSize;
-    vec2 c1  = vec2(.5+sin(t*uSpeed*.4)*.4,  .5+cos(t*uSpeed*.5)*.4);
-    vec2 c2  = vec2(.5+cos(t*uSpeed*.6)*.5,  .5+sin(t*uSpeed*.45)*.5);
-    vec2 c3  = vec2(.5+sin(t*uSpeed*.35)*.45, .5+cos(t*uSpeed*.55)*.45);
-    vec2 c4  = vec2(.5+cos(t*uSpeed*.5)*.4,  .5+sin(t*uSpeed*.4)*.4);
-    vec2 c5  = vec2(.5+sin(t*uSpeed*.7)*.35, .5+cos(t*uSpeed*.6)*.35);
-    vec2 c6  = vec2(.5+cos(t*uSpeed*.45)*.5, .5+sin(t*uSpeed*.65)*.5);
-    vec2 c7  = vec2(.5+sin(t*uSpeed*.55)*.38, .5+cos(t*uSpeed*.48)*.42);
-    vec2 c8  = vec2(.5+cos(t*uSpeed*.65)*.36, .5+sin(t*uSpeed*.52)*.44);
-    vec2 c9  = vec2(.5+sin(t*uSpeed*.42)*.41, .5+cos(t*uSpeed*.58)*.39);
-    vec2 c10 = vec2(.5+cos(t*uSpeed*.48)*.37, .5+sin(t*uSpeed*.62)*.43);
-
-    float i1=1.-smoothstep(0.,r,length(uv-c1));
-    float i2=1.-smoothstep(0.,r,length(uv-c2));
-    float i3=1.-smoothstep(0.,r,length(uv-c3));
-    float i4=1.-smoothstep(0.,r,length(uv-c4));
-    float i5=1.-smoothstep(0.,r,length(uv-c5));
-    float i6=1.-smoothstep(0.,r,length(uv-c6));
-    float i7=1.-smoothstep(0.,r,length(uv-c7));
-    float i8=1.-smoothstep(0.,r,length(uv-c8));
-    float i9=1.-smoothstep(0.,r,length(uv-c9));
-    float i10=1.-smoothstep(0.,r,length(uv-c10));
-
-    vec2 rv1 = uv-.5; float a1 = t*uSpeed*.15;
-    rv1 = vec2(rv1.x*cos(a1)-rv1.y*sin(a1), rv1.x*sin(a1)+rv1.y*cos(a1))+.5;
-    vec2 rv2 = uv-.5; float a2 = -t*uSpeed*.12;
-    rv2 = vec2(rv2.x*cos(a2)-rv2.y*sin(a2), rv2.x*sin(a2)+rv2.y*cos(a2))+.5;
-    float ri1 = 1.-smoothstep(0.,.8,length(rv1-.5));
-    float ri2 = 1.-smoothstep(0.,.8,length(rv2-.5));
-
-    vec3 col = vec3(0.);
-    col += uC1*i1 *(.55+.45*sin(t*uSpeed    ))*uW1;
-    col += uC2*i2 *(.55+.45*cos(t*uSpeed*1.2))*uW2;
-    col += uC3*i3 *(.55+.45*sin(t*uSpeed*.8 ))*uW1;
-    col += uC4*i4 *(.55+.45*cos(t*uSpeed*1.3))*uW2;
-    col += uC5*i5 *(.55+.45*sin(t*uSpeed*1.1))*uW1;
-    col += uC6*i6 *(.55+.45*cos(t*uSpeed*.9 ))*uW2;
-    col += uC1*i7 *(.55+.45*sin(t*uSpeed*1.4))*uW1;
-    col += uC2*i8 *(.55+.45*cos(t*uSpeed*1.5))*uW2;
-    col += uC3*i9 *(.55+.45*sin(t*uSpeed*1.6))*uW1;
-    col += uC4*i10*(.55+.45*cos(t*uSpeed*1.7))*uW2;
-    col += mix(uC1,uC3,ri1)*.45*uW1;
-    col += mix(uC2,uC4,ri2)*.4 *uW2;
-
-    col = clamp(col,0.,1.) * uIntensity;
-    float lum = dot(col, vec3(.299,.587,.114));
-    col = mix(vec3(lum), col, 1.35);
-    col = pow(col, vec3(.92));
-    float br = length(col);
-    col = mix(uBase, col, max(br*1.2, .15));
-    br = length(col); if (br > 1.) col *= 1./br;
-    return col;
-  }
-
-  void main() {
-    vec2 uv = vUv;
-    vec4 tt = texture2D(uTouch, uv);
-    float vx = -(tt.r*2.-1.), vy = -(tt.g*2.-1.), ins = tt.b;
-    uv.x += vx*.8*ins; uv.y += vy*.8*ins;
-    float d = length(uv-.5);
-    uv += vec2(sin(d*20.-uTime*3.)*.04*ins + sin(d*15.-uTime*2.)*.03*ins);
-
-    vec3 col = gradient(uv, uTime);
-    col += grain(uv, uTime) * uGrain;
-    float ts = uTime*.5;
-    col.r += sin(ts)*.02; col.g += cos(ts*1.4)*.02; col.b += sin(ts*1.2)*.02;
-
-    float br2 = length(col); col = mix(uBase, col, max(br2*1.2, .15));
-    col = clamp(col, 0., 1.);
-    float br3 = length(col); if (br3 > 1.) col *= 1./br3;
-    gl_FragColor = vec4(col, 1.);
+  void main(){
+    vec2 uv=vUv;vec4 tt=texture2D(uTouch,uv);
+    float vx=-(tt.r*2.-1.),vy=-(tt.g*2.-1.),ins=tt.b;
+    uv.x+=vx*.8*ins;uv.y+=vy*.8*ins;
+    float d=length(uv-.5);
+    uv+=vec2(sin(d*20.-uTime*3.)*.04*ins+sin(d*15.-uTime*2.)*.03*ins);
+    vec3 col=gradient(uv,uTime);col+=grain(uv,uTime)*uGrain;
+    float ts=uTime*.5;col.r+=sin(ts)*.02;col.g+=cos(ts*1.4)*.02;col.b+=sin(ts*1.2)*.02;
+    float br2=length(col);col=mix(uBase,col,max(br2*1.2,.15));col=clamp(col,0.,1.);
+    float br3=length(col);if(br3>1.)col*=1./br3;gl_FragColor=vec4(col,1.);
   }
 `;
-
-const mesh = new THREE.Mesh(
-  new THREE.PlaneGeometry(2, 2),
-  new THREE.ShaderMaterial({uniforms, vertexShader: vertShader, fragmentShader: fragShader})
-);
+const mesh=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms,vertexShader:vertShader,fragmentShader:fragShader}));
 scene.add(mesh);
-
-function tick() {
-  touch.update();
-  uniforms.uTime.value += Math.min(clock.getDelta(), 0.1);
-  renderer.render(scene, camera);
-  requestAnimationFrame(tick);
-}
+function tick(){touch.update();uniforms.uTime.value+=Math.min(clock.getDelta(),0.1);renderer.render(scene,camera);requestAnimationFrame(tick);}
 tick();
 
-function positionPopup() {
-  const popup = $('popup');
-  const card = document.querySelector('.card');
-  const gap = 16;
-  const rect = card.getBoundingClientRect();
-  const spaceRight = innerWidth - rect.right;
-  const isDesktop = innerWidth > 1024 && !('ontouchstart' in window);
+// ── Scroll-to-top ──
+const scrollBtn = $('scrollTop');
+const scrollContainer = $('scrollContainer');
 
-  if (!isDesktop || spaceRight < 280 + gap * 2) {
-    popup.style.display = 'none';
-    return;
-  }
-  popup.style.display = 'block';
-  popup.style.left = (rect.right + gap) + 'px';
-  popup.style.top = rect.top + 'px';
-  popup.style.right = 'auto';
-  popup.style.bottom = 'auto';
+scrollContainer.addEventListener('scroll', () => {
+  scrollBtn.classList.toggle('visible', scrollContainer.scrollTop > 120);
+});
+
+scrollBtn.addEventListener('click', () => {
+  scrollContainer.scrollTo({top: 0, behavior: 'smooth'});
+});
+
+function positionPopup() {
+  const popup=$('popup');const card=document.querySelector('.card');const gap=16;
+  const rect=card.getBoundingClientRect();const spaceRight=innerWidth-rect.right;
+  const isDesktop=innerWidth>1024&&!('ontouchstart' in window);
+  if (!isDesktop||spaceRight<280+gap*2){popup.style.display='none';return;}
+  popup.style.display='block';popup.style.left=(rect.right+gap)+'px';popup.style.top=rect.top+'px';
+  popup.style.right='auto';popup.style.bottom='auto';
 }
 
-window.addEventListener('resize', () => {
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-  uniforms.uResolution.value.set(innerWidth, innerHeight);
+window.addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);uniforms.uResolution.value.set(innerWidth,innerHeight);
   positionPopup();
 });
-
-window.addEventListener('mousemove', e => {
-  touch.addTouch({x: e.clientX / innerWidth, y: 1 - e.clientY / innerHeight});
-});
-
-window.addEventListener('touchmove', e => {
-  const t = e.touches[0];
-  touch.addTouch({x: t.clientX / innerWidth, y: 1 - t.clientY / innerHeight});
-}, {passive: true});
+window.addEventListener('mousemove',e=>{touch.addTouch({x:e.clientX/innerWidth,y:1-e.clientY/innerHeight});});
+window.addEventListener('touchmove',e=>{const t=e.touches[0];touch.addTouch({x:t.clientX/innerWidth,y:1-t.clientY/innerHeight});},{passive:true});
 
 positionPopup();
-
-if (innerWidth > 1024 && !('ontouchstart' in window)) {
-  setTimeout(() => {
-    positionPopup();
-    const popup = $('popup');
-    if (popup.style.display !== 'none') popup.classList.add('show');
-  }, 4000);
+if (innerWidth>1024&&!('ontouchstart' in window)) {
+  setTimeout(()=>{positionPopup();const popup=$('popup');if(popup.style.display!=='none')popup.classList.add('show');},4000);
 }
 
 fetch('https://api.github.com/repos/Gur0v/gur0v.github.io/commits?per_page=1')
-  .then(r => r.json())
-  .then(data => {
-    const c = data[0];
-    const sha = c.sha.slice(0, 7);
-    const date = new Date(c.commit.author.date).toISOString().slice(0, 10);
-    const el = $('commit-info');
-    el.innerHTML = `<a href="${c.html_url}" target="_blank" rel="noopener" title="${c.commit.message.split('\n')[0]}">${sha}</a> · ${date}`;
-  })
-  .catch(() => {
-    $('commit-info').textContent = 'unknown';
-  });
+  .then(r=>r.json()).then(data=>{
+    const c=data[0];const sha=c.sha.slice(0,7);
+    const date=new Date(c.commit.author.date).toISOString().slice(0,10);
+    const el=$('commit-info');
+    el.innerHTML=`<a href="${c.html_url}" target="_blank" rel="noopener" title="${c.commit.message.split('\n')[0]}">${sha}</a> · ${date}`;
+  }).catch(()=>{$('commit-info').textContent='unknown';});
 </script>
 </body>
 </html>
