@@ -9,115 +9,311 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden}
-body{font-family:'Space Grotesk',sans-serif;background:#0a0e27}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-#webGLApp{position:fixed;inset:0;z-index:1}
-
-.site{position:fixed;inset:0;z-index:10;overflow-y:auto;display:flex;flex-direction:column}
-.inner{max-width:740px;margin:0 auto;width:100%;padding:clamp(1.5rem,5vw,2.5rem) clamp(1rem,4vw,1.5rem);flex:1;display:flex;flex-direction:column}
-
-.card{background:rgba(0,0,0,0.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:clamp(1.5rem,5vw,2.25rem);color:#e6e6e6;flex:1}
-
-header{padding-bottom:1.25rem;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:1.75rem}
-h1{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,5vw,2rem);font-weight:800;color:#fff;letter-spacing:-.02em}
-nav{display:flex;flex-wrap:wrap;gap:.6rem 1.25rem;margin-top:.85rem;font-size:.9rem}
-nav a{color:rgba(255,255,255,0.45);text-decoration:none;transition:color .15s;position:relative;padding:.2rem 0;font-weight:500}
-nav a::after{content:"";position:absolute;bottom:.2rem;left:0;width:0;height:1px;background:#F15A22;transition:width .2s}
-nav a:hover{color:#F15A22}
-nav a:hover::after{width:100%}
-
-section{margin-bottom:1.75rem}
-h2{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:600;margin-bottom:.9rem;color:rgba(255,255,255,0.4);letter-spacing:.1em;text-transform:uppercase}
-p{margin-bottom:.7rem;color:rgba(255,255,255,0.75);font-size:.93rem;line-height:1.7;font-weight:400}
-
-ul{list-style:none}
-li{margin-bottom:1rem}
-.proj{display:flex;flex-direction:column;gap:.3rem}
-.proj a{color:#F15A22;text-decoration:none;font-weight:600;font-size:.95rem;transition:color .15s;display:inline-flex;align-items:center;gap:.25rem;font-family:'Syne',sans-serif}
-.proj a:hover{color:#ff7a47}
-.proj .dsc{color:rgba(255,255,255,0.45);font-size:.88rem;line-height:1.55}
-.tag{font-style:italic;color:rgba(255,255,255,0.3);font-size:.875rem;margin-top:.5rem}
-
-.uses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.6rem}
-.uses-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:.65rem .85rem;display:flex;flex-direction:column;gap:.2rem}
-.uses-item .uses-label{font-size:.75rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:.08em;font-family:'Syne',sans-serif;font-weight:600}
-.uses-item .uses-val{font-size:.9rem;color:rgba(255,255,255,0.8);font-weight:500}
-
-footer{padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3);font-size:.8rem}
-.frow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem;margin-bottom:.85rem}
-.frow a{color:#F15A22;text-decoration:none}
-.soc{display:flex;flex-wrap:wrap;gap:.5rem}
-.soc a{color:rgba(255,255,255,0.4);text-decoration:none;font-size:.82rem;padding:.3rem .7rem;border:1px solid rgba(255,255,255,0.12);border-radius:6px;transition:all .15s;font-family:'Syne',sans-serif;font-weight:500;letter-spacing:.03em}
-.soc a:hover{border-color:#F15A22;color:#F15A22;background:rgba(241,90,34,0.08)}
-
-#commit-info a{color:inherit;text-decoration:none}
-#commit-info a:hover{color:#F15A22}
-
-#popup{
-  display:none;position:fixed;z-index:20;width:280px;
-  background:rgba(0,0,0,0.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.08);border-radius:8px;
-  padding:1rem 1.25rem;
-  font-family:'Space Grotesk',sans-serif;font-size:.88rem;line-height:1.6;color:rgba(255,255,255,0.7);
-  opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease;pointer-events:none;
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: 'Space Grotesk', sans-serif;
+  background: #0a0e27;
 }
-#popup.show{opacity:1;transform:translateY(0);pointer-events:auto}
-#popup strong{display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;color:#fff;margin-bottom:.4rem}
-#popup a.btn{
-  display:inline-block;margin-top:.65rem;
-  color:#F15A22;text-decoration:none;font-family:'Syne',sans-serif;font-weight:600;font-size:.85rem;
-  border:1px solid rgba(241,90,34,0.45);border-radius:6px;padding:.3rem .75rem;
-  transition:background .15s,border-color .15s;
-}
-#popup a.btn:hover{background:rgba(241,90,34,0.12);border-color:#F15A22}
-#popup .close{
-  position:absolute;top:.55rem;right:.65rem;
-  background:none;border:none;color:rgba(255,255,255,0.3);font-size:1rem;cursor:pointer;line-height:1;padding:0;transition:color .15s;
-}
-#popup .close:hover{color:#fff}
 
-#scrollTop{
-  position:fixed;bottom:1.5rem;right:1.5rem;z-index:30;
-  width:42px;height:42px;
-  background:rgba(0,0,0,0.5);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,0.12);
-  border-radius:50%;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;
-  transform:translateY(10px);
-  transition:opacity .3s ease, transform .3s ease, border-color .15s, background .15s;
+#canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
 }
-#scrollTop.visible{opacity:1;pointer-events:auto;transform:translateY(0)}
-#scrollTop:hover{border-color:#F15A22;background:rgba(241,90,34,0.15)}
-#scrollTop svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
-#scrollTop:hover svg{stroke:#F15A22}
 
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.site {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.inner {
+  max-width: 740px;
+  margin: 0 auto;
+  width: 100%;
+  padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.5rem);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card {
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: clamp(1.5rem, 5vw, 2.25rem);
+  color: #e6e6e6;
+  flex: 1;
+}
+
+header {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 1.75rem;
+}
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.6rem, 5vw, 2rem);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+
+section { margin-bottom: 1.75rem; }
+
+h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.9rem;
+}
+
+p {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.93rem;
+  line-height: 1.7;
+  font-weight: 400;
+  margin-bottom: 0.7rem;
+}
+
+ul { list-style: none; }
+
+li { margin-bottom: 1rem; }
+
+.proj { display: flex; flex-direction: column; gap: 0.3rem; }
+
+.proj a {
+  color: #F15A22;
+  text-decoration: none;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: color 0.15s;
+}
+
+.proj a:hover { color: #ff7a47; }
+
+.proj .dsc {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.uses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.6rem;
+}
+
+.uses-item {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.uses-item .uses-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.uses-item .uses-val {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+footer {
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.8rem;
+}
+
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.footer-row a { color: #F15A22; text-decoration: none; }
+
+.socials { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.socials a {
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  font-family: 'Syne', sans-serif;
+  font-weight: 500;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.socials a:hover {
+  color: #F15A22;
+  border-color: #F15A22;
+  background: rgba(241, 90, 34, 0.08);
+}
+
+#commit-info a { color: inherit; text-decoration: none; }
+#commit-info a:hover { color: #F15A22; }
+
+#popup {
+  display: none;
+  position: fixed;
+  z-index: 20;
+  width: 280px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  pointer-events: none;
+}
+
+#popup.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+#popup strong {
+  display: block;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #fff;
+  margin-bottom: 0.4rem;
+}
+
+#popup .btn {
+  display: inline-block;
+  margin-top: 0.65rem;
+  color: #F15A22;
+  text-decoration: none;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: 1px solid rgba(241, 90, 34, 0.45);
+  border-radius: 6px;
+  padding: 0.3rem 0.75rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+#popup .btn:hover { background: rgba(241, 90, 34, 0.12); border-color: #F15A22; }
+
+#popup .popup-close {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.65rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+#popup .popup-close:hover { color: #fff; }
+
+#scroll-top {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 30;
+  width: 42px;
+  height: 42px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.15s, background 0.15s;
+}
+
+#scroll-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+#scroll-top:hover { border-color: #F15A22; background: rgba(241, 90, 34, 0.15); }
+
+#scroll-top svg {
+  width: 16px; height: 16px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.15s;
+}
+
+#scroll-top:hover svg { stroke: #F15A22; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
 </style>
 </head>
 <body>
 
-<canvas id="webGLApp"></canvas>
+<canvas id="canvas"></canvas>
 
-<div class="site" id="scrollContainer">
+<div class="site" id="site">
   <div class="inner">
     <div class="card">
+
       <header>
         <h1>Gurov</h1>
       </header>
+
       <main>
         <section id="about">
-          <h2>about</h2>
+          <h2>About</h2>
           <p>From Kyiv, Ukraine. Hobbyist programmer and FOSS enthusiast.</p>
           <p>Bodybuilding for 2+ years, recently got into arm wrestling (left hand, open style).</p>
           <p>Into rap — mostly 2010s trap, but also experimental hip hop and rap rock.</p>
         </section>
+
         <section id="projects">
-          <h2>projects</h2>
+          <h2>Projects</h2>
           <ul>
             <li class="proj">
               <a href="https://github.com/Gur0v/zeptofetch" target="_blank" rel="noopener">zeptofetch ↗</a>
@@ -129,237 +325,367 @@ footer{padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.08);color:rgb
             </li>
           </ul>
         </section>
+
         <section id="uses">
-          <h2>uses</h2>
+          <h2>Uses</h2>
           <div class="uses-grid">
-            <div class="uses-item">
-              <span class="uses-label">CPU</span>
-              <span class="uses-val">AMD Ryzen 5 5600</span>
-            </div>
-            <div class="uses-item">
-              <span class="uses-label">GPU</span>
-              <span class="uses-val">AMD Radeon RX 7600</span>
-            </div>
-            <div class="uses-item">
-              <span class="uses-label">Motherboard</span>
-              <span class="uses-val">MSI B550-A PRO</span>
-            </div>
-            <div class="uses-item">
-              <span class="uses-label">Memory</span>
-              <span class="uses-val">32GB DDR4 @ 3200</span>
-            </div>
-            <div class="uses-item">
-              <span class="uses-label">OS</span>
-              <span class="uses-val">Arch Linux</span>
-            </div>
-            <div class="uses-item">
-              <span class="uses-label">Desktop</span>
-              <span class="uses-val">Xfce (Xlibre)</span>
-            </div>
+            <div class="uses-item"><span class="uses-label">CPU</span><span class="uses-val">AMD Ryzen 5 5600</span></div>
+            <div class="uses-item"><span class="uses-label">GPU</span><span class="uses-val">AMD Radeon RX 7600</span></div>
+            <div class="uses-item"><span class="uses-label">Motherboard</span><span class="uses-val">MSI B550-A PRO</span></div>
+            <div class="uses-item"><span class="uses-label">Memory</span><span class="uses-val">32GB DDR4 @ 3200</span></div>
+            <div class="uses-item"><span class="uses-label">OS</span><span class="uses-val">Arch Linux</span></div>
+            <div class="uses-item"><span class="uses-label">Desktop</span><span class="uses-val">Xfce (Xlibre)</span></div>
           </div>
         </section>
       </main>
+
       <footer>
-        <div class="frow">
+        <div class="footer-row">
           <span id="commit-info">…</span>
           <span>Source under <a href="https://github.com/Gur0v/gur0v.github.io">AGPL-3.0</a></span>
         </div>
-        <div class="soc">
+        <div class="socials">
           <a href="https://github.com/Gur0v" target="_blank" rel="noopener">GitHub</a>
           <a href="https://www.last.fm/user/gur0v" target="_blank" rel="noopener">Last.fm</a>
           <a href="https://discord.com/users/507198451998523392" target="_blank" rel="noopener">Discord</a>
         </div>
       </footer>
+
     </div>
   </div>
 </div>
 
-<!-- Scroll-to-top button -->
-<button id="scrollTop" aria-label="Scroll to top">
+<button id="scroll-top" aria-label="Scroll to top">
   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <polyline points="18 15 12 9 6 15"/>
   </svg>
 </button>
 
-<div id="popup">
-  <button class="close" onclick="this.parentElement.classList.remove('show')" aria-label="Dismiss">&times;</button>
-  <strong>Stop Google restricting APKs</strong>
+<div id="popup" role="dialog" aria-modal="true" aria-labelledby="popup-title">
+  <button class="popup-close" aria-label="Dismiss">&#x2715;</button>
+  <strong id="popup-title">Stop Google restricting APKs</strong>
   Keep sideloading free and open.
   <a class="btn" href="https://c.org/vYQKRTkxcJ" target="_blank" rel="noopener">Sign now ↗</a>
 </div>
 
 <script>
-const $ = id => document.getElementById(id);
+const el = id => document.getElementById(id);
 
 class TouchTexture {
   constructor() {
-    this.maxAge = 64; this.radius = 16; this.speed = 1/64;
-    this.trail = []; this.last = null;
-    this.canvas = Object.assign(document.createElement('canvas'), {width:64,height:64});
+    this.maxAge = 64;
+    this.radius = 16;
+    this.speed = 1 / 64;
+    this.trail = [];
+    this.last = null;
+
+    this.canvas = document.createElement('canvas');
+    this.canvas.width = 64;
+    this.canvas.height = 64;
+
     this.ctx = this.canvas.getContext('2d');
     this.ctx.fillStyle = 'black';
-    this.ctx.fillRect(0,0,64,64);
+    this.ctx.fillRect(0, 0, 64, 64);
+
     this.texture = new THREE.Texture(this.canvas);
   }
+
   addTouch(pt) {
-    let vx=0,vy=0,force=0;
+    let vx = 0, vy = 0, force = 0;
     if (this.last) {
-      const dx=pt.x-this.last.x, dy=pt.y-this.last.y;
-      if (!dx&&!dy) return;
-      const d=Math.sqrt(dx*dx+dy*dy);
-      vx=dx/d; vy=dy/d;
-      force=Math.min((dx*dx+dy*dy)*20000,2);
+      const dx = pt.x - this.last.x;
+      const dy = pt.y - this.last.y;
+      if (!dx && !dy) return;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      vx = dx / d;
+      vy = dy / d;
+      force = Math.min((dx * dx + dy * dy) * 20000, 2);
     }
-    this.last={x:pt.x,y:pt.y};
-    this.trail.push({x:pt.x,y:pt.y,age:0,force,vx,vy});
+    this.last = { x: pt.x, y: pt.y };
+    this.trail.push({ x: pt.x, y: pt.y, age: 0, force, vx, vy });
   }
+
   update() {
-    this.ctx.fillStyle='black';
-    this.ctx.fillRect(0,0,64,64);
-    for (let i=this.trail.length-1;i>=0;i--) {
-      const p=this.trail[i];
-      const f=p.force*this.speed*(1-p.age/this.maxAge);
-      p.x+=p.vx*f; p.y+=p.vy*f; p.age++;
-      if (p.age>this.maxAge) this.trail.splice(i,1);
+    this.ctx.fillStyle = 'black';
+    this.ctx.fillRect(0, 0, 64, 64);
+
+    for (let i = this.trail.length - 1; i >= 0; i--) {
+      const p = this.trail[i];
+      const f = p.force * this.speed * (1 - p.age / this.maxAge);
+      p.x += p.vx * f;
+      p.y += p.vy * f;
+      p.age++;
+      if (p.age > this.maxAge) this.trail.splice(i, 1);
       else this._drawPoint(p);
     }
-    this.texture.needsUpdate=true;
+
+    this.texture.needsUpdate = true;
   }
+
   _drawPoint(p) {
-    const s=64,x=p.x*s,y=(1-p.y)*s,off=s*5,r=this.radius;
-    const t=p.age/this.maxAge;
-    let intensity=t<0.3?Math.sin((t/0.3)*(Math.PI/2)):Math.max(0,1-(t-0.3)/0.7);
-    intensity*=p.force;
-    const col=`${((p.vx+1)/2)*255},${((p.vy+1)/2)*255},${intensity*255}`;
-    this.ctx.shadowOffsetX=off; this.ctx.shadowOffsetY=off;
-    this.ctx.shadowBlur=r;
-    this.ctx.shadowColor=`rgba(${col},${0.2*intensity})`;
+    const s = 64;
+    const x = p.x * s;
+    const y = (1 - p.y) * s;
+    const off = s * 5;
+    const t = p.age / this.maxAge;
+    const intensity = (t < 0.3
+      ? Math.sin((t / 0.3) * (Math.PI / 2))
+      : Math.max(0, 1 - (t - 0.3) / 0.7)) * p.force;
+
+    const col = `${((p.vx + 1) / 2) * 255},${((p.vy + 1) / 2) * 255},${intensity * 255}`;
+
+    this.ctx.shadowOffsetX = off;
+    this.ctx.shadowOffsetY = off;
+    this.ctx.shadowBlur = this.radius;
+    this.ctx.shadowColor = `rgba(${col},${0.2 * intensity})`;
+    this.ctx.fillStyle = 'rgba(255,0,0,1)';
     this.ctx.beginPath();
-    this.ctx.fillStyle='rgba(255,0,0,1)';
-    this.ctx.arc(x-off,y-off,r,0,Math.PI*2);
+    this.ctx.arc(x - off, y - off, this.radius, 0, Math.PI * 2);
     this.ctx.fill();
   }
 }
 
-const renderer = new THREE.WebGLRenderer({canvas:$('webGLApp'),antialias:true,alpha:false,stencil:false,depth:false});
-renderer.setSize(innerWidth,innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const renderer = new THREE.WebGLRenderer({
+  canvas: el('canvas'),
+  antialias: true,
+  alpha: false,
+  stencil: false,
+  depth: false,
+});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0e27);
-const camera = new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,10000);
-camera.position.z=50;
+
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 10000);
+camera.position.z = 50;
+
 const clock = new THREE.Clock();
 const touch = new TouchTexture();
-const V3=(r,g,b)=>new THREE.Vector3(r,g,b);
-const uniforms={
-  uTime:{value:0},uResolution:{value:new THREE.Vector2(innerWidth,innerHeight)},
-  uTouch:{value:touch.texture},
-  uC1:{value:V3(0.945,0.353,0.133)},uC2:{value:V3(0,0.259,0.22)},
-  uC3:{value:V3(0.945,0.353,0.133)},uC4:{value:V3(0,0,0)},
-  uC5:{value:V3(0.945,0.353,0.133)},uC6:{value:V3(0,0,0)},
-  uBase:{value:V3(0.039,0.055,0.153)},
-  uSpeed:{value:1.5},uIntensity:{value:1.8},uGrain:{value:0.08},
-  uGradSize:{value:0.45},uW1:{value:0.5},uW2:{value:1.8},
+
+const v3 = (r, g, b) => new THREE.Vector3(r, g, b);
+
+const uniforms = {
+  uTime:       { value: 0 },
+  uResolution: { value: new THREE.Vector2(innerWidth, innerHeight) },
+  uTouch:      { value: touch.texture },
+  uC1:         { value: v3(0.945, 0.353, 0.133) },
+  uC2:         { value: v3(0, 0.259, 0.22) },
+  uC3:         { value: v3(0.945, 0.353, 0.133) },
+  uC4:         { value: v3(0, 0, 0) },
+  uC5:         { value: v3(0.945, 0.353, 0.133) },
+  uC6:         { value: v3(0, 0, 0) },
+  uBase:       { value: v3(0.039, 0.055, 0.153) },
+  uSpeed:      { value: 1.5 },
+  uIntensity:  { value: 1.8 },
+  uGrain:      { value: 0.08 },
+  uGradSize:   { value: 0.45 },
+  uW1:         { value: 0.5 },
+  uW2:         { value: 1.8 },
 };
-const vertShader=`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`;
-const fragShader=`
-  uniform float uTime;uniform vec2 uResolution;
-  uniform vec3 uC1,uC2,uC3,uC4,uC5,uC6,uBase;
-  uniform float uSpeed,uIntensity,uGrain,uGradSize,uW1,uW2;
-  uniform sampler2D uTouch;varying vec2 vUv;
-  float grain(vec2 uv,float t){vec2 g=uv*uResolution*.5;return fract(sin(dot(g+t,vec2(12.9898,78.233)))*43758.5453)*2.-1.;}
-  vec3 gradient(vec2 uv,float t){
-    float r=uGradSize;
-    vec2 c1=vec2(.5+sin(t*uSpeed*.4)*.4,.5+cos(t*uSpeed*.5)*.4);
-    vec2 c2=vec2(.5+cos(t*uSpeed*.6)*.5,.5+sin(t*uSpeed*.45)*.5);
-    vec2 c3=vec2(.5+sin(t*uSpeed*.35)*.45,.5+cos(t*uSpeed*.55)*.45);
-    vec2 c4=vec2(.5+cos(t*uSpeed*.5)*.4,.5+sin(t*uSpeed*.4)*.4);
-    vec2 c5=vec2(.5+sin(t*uSpeed*.7)*.35,.5+cos(t*uSpeed*.6)*.35);
-    vec2 c6=vec2(.5+cos(t*uSpeed*.45)*.5,.5+sin(t*uSpeed*.65)*.5);
-    vec2 c7=vec2(.5+sin(t*uSpeed*.55)*.38,.5+cos(t*uSpeed*.48)*.42);
-    vec2 c8=vec2(.5+cos(t*uSpeed*.65)*.36,.5+sin(t*uSpeed*.52)*.44);
-    vec2 c9=vec2(.5+sin(t*uSpeed*.42)*.41,.5+cos(t*uSpeed*.58)*.39);
-    vec2 c10=vec2(.5+cos(t*uSpeed*.48)*.37,.5+sin(t*uSpeed*.62)*.43);
-    float i1=1.-smoothstep(0.,r,length(uv-c1));float i2=1.-smoothstep(0.,r,length(uv-c2));
-    float i3=1.-smoothstep(0.,r,length(uv-c3));float i4=1.-smoothstep(0.,r,length(uv-c4));
-    float i5=1.-smoothstep(0.,r,length(uv-c5));float i6=1.-smoothstep(0.,r,length(uv-c6));
-    float i7=1.-smoothstep(0.,r,length(uv-c7));float i8=1.-smoothstep(0.,r,length(uv-c8));
-    float i9=1.-smoothstep(0.,r,length(uv-c9));float i10=1.-smoothstep(0.,r,length(uv-c10));
-    vec2 rv1=uv-.5;float a1=t*uSpeed*.15;
-    rv1=vec2(rv1.x*cos(a1)-rv1.y*sin(a1),rv1.x*sin(a1)+rv1.y*cos(a1))+.5;
-    vec2 rv2=uv-.5;float a2=-t*uSpeed*.12;
-    rv2=vec2(rv2.x*cos(a2)-rv2.y*sin(a2),rv2.x*sin(a2)+rv2.y*cos(a2))+.5;
-    float ri1=1.-smoothstep(0.,.8,length(rv1-.5));float ri2=1.-smoothstep(0.,.8,length(rv2-.5));
-    vec3 col=vec3(0.);
-    col+=uC1*i1*(.55+.45*sin(t*uSpeed))*uW1;col+=uC2*i2*(.55+.45*cos(t*uSpeed*1.2))*uW2;
-    col+=uC3*i3*(.55+.45*sin(t*uSpeed*.8))*uW1;col+=uC4*i4*(.55+.45*cos(t*uSpeed*1.3))*uW2;
-    col+=uC5*i5*(.55+.45*sin(t*uSpeed*1.1))*uW1;col+=uC6*i6*(.55+.45*cos(t*uSpeed*.9))*uW2;
-    col+=uC1*i7*(.55+.45*sin(t*uSpeed*1.4))*uW1;col+=uC2*i8*(.55+.45*cos(t*uSpeed*1.5))*uW2;
-    col+=uC3*i9*(.55+.45*sin(t*uSpeed*1.6))*uW1;col+=uC4*i10*(.55+.45*cos(t*uSpeed*1.7))*uW2;
-    col+=mix(uC1,uC3,ri1)*.45*uW1;col+=mix(uC2,uC4,ri2)*.4*uW2;
-    col=clamp(col,0.,1.)*uIntensity;
-    float lum=dot(col,vec3(.299,.587,.114));col=mix(vec3(lum),col,1.35);
-    col=pow(col,vec3(.92));float br=length(col);col=mix(uBase,col,max(br*1.2,.15));
-    br=length(col);if(br>1.)col*=1./br;return col;
-  }
-  void main(){
-    vec2 uv=vUv;vec4 tt=texture2D(uTouch,uv);
-    float vx=-(tt.r*2.-1.),vy=-(tt.g*2.-1.),ins=tt.b;
-    uv.x+=vx*.8*ins;uv.y+=vy*.8*ins;
-    float d=length(uv-.5);
-    uv+=vec2(sin(d*20.-uTime*3.)*.04*ins+sin(d*15.-uTime*2.)*.03*ins);
-    vec3 col=gradient(uv,uTime);col+=grain(uv,uTime)*uGrain;
-    float ts=uTime*.5;col.r+=sin(ts)*.02;col.g+=cos(ts*1.4)*.02;col.b+=sin(ts*1.2)*.02;
-    float br2=length(col);col=mix(uBase,col,max(br2*1.2,.15));col=clamp(col,0.,1.);
-    float br3=length(col);if(br3>1.)col*=1./br3;gl_FragColor=vec4(col,1.);
+
+const vertexShader = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = vec4(position.xy, 0., 1.);
   }
 `;
-const mesh=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms,vertexShader:vertShader,fragmentShader:fragShader}));
+
+const fragmentShader = `
+  uniform float uTime;
+  uniform vec2 uResolution;
+  uniform vec3 uC1, uC2, uC3, uC4, uC5, uC6, uBase;
+  uniform float uSpeed, uIntensity, uGrain, uGradSize, uW1, uW2;
+  uniform sampler2D uTouch;
+  varying vec2 vUv;
+
+  float grain(vec2 uv, float t) {
+    vec2 g = uv * uResolution * .5;
+    return fract(sin(dot(g + t, vec2(12.9898, 78.233))) * 43758.5453) * 2. - 1.;
+  }
+
+  vec3 gradient(vec2 uv, float t) {
+    float r = uGradSize;
+    vec2 c1  = vec2(.5 + sin(t*uSpeed*.4)*.4,  .5 + cos(t*uSpeed*.5)*.4);
+    vec2 c2  = vec2(.5 + cos(t*uSpeed*.6)*.5,  .5 + sin(t*uSpeed*.45)*.5);
+    vec2 c3  = vec2(.5 + sin(t*uSpeed*.35)*.45, .5 + cos(t*uSpeed*.55)*.45);
+    vec2 c4  = vec2(.5 + cos(t*uSpeed*.5)*.4,  .5 + sin(t*uSpeed*.4)*.4);
+    vec2 c5  = vec2(.5 + sin(t*uSpeed*.7)*.35, .5 + cos(t*uSpeed*.6)*.35);
+    vec2 c6  = vec2(.5 + cos(t*uSpeed*.45)*.5, .5 + sin(t*uSpeed*.65)*.5);
+    vec2 c7  = vec2(.5 + sin(t*uSpeed*.55)*.38, .5 + cos(t*uSpeed*.48)*.42);
+    vec2 c8  = vec2(.5 + cos(t*uSpeed*.65)*.36, .5 + sin(t*uSpeed*.52)*.44);
+    vec2 c9  = vec2(.5 + sin(t*uSpeed*.42)*.41, .5 + cos(t*uSpeed*.58)*.39);
+    vec2 c10 = vec2(.5 + cos(t*uSpeed*.48)*.37, .5 + sin(t*uSpeed*.62)*.43);
+
+    float i1  = 1. - smoothstep(0., r, length(uv - c1));
+    float i2  = 1. - smoothstep(0., r, length(uv - c2));
+    float i3  = 1. - smoothstep(0., r, length(uv - c3));
+    float i4  = 1. - smoothstep(0., r, length(uv - c4));
+    float i5  = 1. - smoothstep(0., r, length(uv - c5));
+    float i6  = 1. - smoothstep(0., r, length(uv - c6));
+    float i7  = 1. - smoothstep(0., r, length(uv - c7));
+    float i8  = 1. - smoothstep(0., r, length(uv - c8));
+    float i9  = 1. - smoothstep(0., r, length(uv - c9));
+    float i10 = 1. - smoothstep(0., r, length(uv - c10));
+
+    vec2 rv1 = uv - .5;
+    float a1 = t * uSpeed * .15;
+    rv1 = vec2(rv1.x*cos(a1) - rv1.y*sin(a1), rv1.x*sin(a1) + rv1.y*cos(a1)) + .5;
+
+    vec2 rv2 = uv - .5;
+    float a2 = -t * uSpeed * .12;
+    rv2 = vec2(rv2.x*cos(a2) - rv2.y*sin(a2), rv2.x*sin(a2) + rv2.y*cos(a2)) + .5;
+
+    float ri1 = 1. - smoothstep(0., .8, length(rv1 - .5));
+    float ri2 = 1. - smoothstep(0., .8, length(rv2 - .5));
+
+    vec3 col = vec3(0.);
+    col += uC1 * i1  * (.55 + .45*sin(t*uSpeed))       * uW1;
+    col += uC2 * i2  * (.55 + .45*cos(t*uSpeed*1.2))   * uW2;
+    col += uC3 * i3  * (.55 + .45*sin(t*uSpeed*.8))    * uW1;
+    col += uC4 * i4  * (.55 + .45*cos(t*uSpeed*1.3))   * uW2;
+    col += uC5 * i5  * (.55 + .45*sin(t*uSpeed*1.1))   * uW1;
+    col += uC6 * i6  * (.55 + .45*cos(t*uSpeed*.9))    * uW2;
+    col += uC1 * i7  * (.55 + .45*sin(t*uSpeed*1.4))   * uW1;
+    col += uC2 * i8  * (.55 + .45*cos(t*uSpeed*1.5))   * uW2;
+    col += uC3 * i9  * (.55 + .45*sin(t*uSpeed*1.6))   * uW1;
+    col += uC4 * i10 * (.55 + .45*cos(t*uSpeed*1.7))   * uW2;
+    col += mix(uC1, uC3, ri1) * .45 * uW1;
+    col += mix(uC2, uC4, ri2) * .40 * uW2;
+
+    col = clamp(col, 0., 1.) * uIntensity;
+    float lum = dot(col, vec3(.299, .587, .114));
+    col = mix(vec3(lum), col, 1.35);
+    col = pow(col, vec3(.92));
+    float br = length(col);
+    col = mix(uBase, col, max(br * 1.2, .15));
+    br = length(col);
+    if (br > 1.) col *= 1. / br;
+    return col;
+  }
+
+  void main() {
+    vec2 uv = vUv;
+    vec4 tt = texture2D(uTouch, uv);
+    float vx = -(tt.r * 2. - 1.);
+    float vy = -(tt.g * 2. - 1.);
+    float ins = tt.b;
+
+    uv.x += vx * .8 * ins;
+    uv.y += vy * .8 * ins;
+
+    float d = length(uv - .5);
+    uv += vec2(
+      sin(d * 20. - uTime * 3.) * .04 * ins + sin(d * 15. - uTime * 2.) * .03 * ins
+    );
+
+    vec3 col = gradient(uv, uTime);
+    col += grain(uv, uTime) * uGrain;
+
+    float ts = uTime * .5;
+    col.r += sin(ts) * .02;
+    col.g += cos(ts * 1.4) * .02;
+    col.b += sin(ts * 1.2) * .02;
+
+    float br2 = length(col);
+    col = mix(uBase, col, max(br2 * 1.2, .15));
+    col = clamp(col, 0., 1.);
+
+    float br3 = length(col);
+    if (br3 > 1.) col *= 1. / br3;
+
+    gl_FragColor = vec4(col, 1.);
+  }
+`;
+
+const mesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(2, 2),
+  new THREE.ShaderMaterial({ uniforms, vertexShader, fragmentShader })
+);
 scene.add(mesh);
-function tick(){touch.update();uniforms.uTime.value+=Math.min(clock.getDelta(),0.1);renderer.render(scene,camera);requestAnimationFrame(tick);}
+
+function tick() {
+  touch.update();
+  uniforms.uTime.value += Math.min(clock.getDelta(), 0.1);
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
 tick();
 
-// ── Scroll-to-top ──
-const scrollBtn = $('scrollTop');
-const scrollContainer = $('scrollContainer');
+const scrollBtn = el('scroll-top');
+const site = el('site');
 
-scrollContainer.addEventListener('scroll', () => {
-  scrollBtn.classList.toggle('visible', scrollContainer.scrollTop > 120);
+site.addEventListener('scroll', () => {
+  scrollBtn.classList.toggle('visible', site.scrollTop > 120);
 });
 
 scrollBtn.addEventListener('click', () => {
-  scrollContainer.scrollTo({top: 0, behavior: 'smooth'});
+  site.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 function positionPopup() {
-  const popup=$('popup');const card=document.querySelector('.card');const gap=16;
-  const rect=card.getBoundingClientRect();const spaceRight=innerWidth-rect.right;
-  const isDesktop=innerWidth>1024&&!('ontouchstart' in window);
-  if (!isDesktop||spaceRight<280+gap*2){popup.style.display='none';return;}
-  popup.style.display='block';popup.style.left=(rect.right+gap)+'px';popup.style.top=rect.top+'px';
-  popup.style.right='auto';popup.style.bottom='auto';
+  const popup = el('popup');
+  const card = document.querySelector('.card');
+  const GAP = 16;
+  const rect = card.getBoundingClientRect();
+  const spaceRight = innerWidth - rect.right;
+  const isDesktop = innerWidth > 1024 && !('ontouchstart' in window);
+
+  if (!isDesktop || spaceRight < 280 + GAP * 2) {
+    popup.style.display = 'none';
+    return;
+  }
+
+  popup.style.display = 'block';
+  popup.style.left = (rect.right + GAP) + 'px';
+  popup.style.top = rect.top + 'px';
+  popup.style.right = 'auto';
+  popup.style.bottom = 'auto';
 }
 
-window.addEventListener('resize',()=>{
-  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth,innerHeight);uniforms.uResolution.value.set(innerWidth,innerHeight);
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  uniforms.uResolution.value.set(innerWidth, innerHeight);
   positionPopup();
 });
-window.addEventListener('mousemove',e=>{touch.addTouch({x:e.clientX/innerWidth,y:1-e.clientY/innerHeight});});
-window.addEventListener('touchmove',e=>{const t=e.touches[0];touch.addTouch({x:t.clientX/innerWidth,y:1-t.clientY/innerHeight});},{passive:true});
+
+window.addEventListener('mousemove', e => {
+  touch.addTouch({ x: e.clientX / innerWidth, y: 1 - e.clientY / innerHeight });
+});
+
+window.addEventListener('touchmove', e => {
+  const t = e.touches[0];
+  touch.addTouch({ x: t.clientX / innerWidth, y: 1 - t.clientY / innerHeight });
+}, { passive: true });
+
+document.querySelector('.popup-close').addEventListener('click', () => {
+  el('popup').classList.remove('show');
+});
 
 positionPopup();
-if (innerWidth>1024&&!('ontouchstart' in window)) {
-  setTimeout(()=>{positionPopup();const popup=$('popup');if(popup.style.display!=='none')popup.classList.add('show');},4000);
+
+if (innerWidth > 1024 && !('ontouchstart' in window)) {
+  setTimeout(() => {
+    positionPopup();
+    const popup = el('popup');
+    if (popup.style.display !== 'none') popup.classList.add('show');
+  }, 4000);
 }
 
 fetch('https://api.github.com/repos/Gur0v/gur0v.github.io/commits?per_page=1')
-  .then(r=>r.json()).then(data=>{
-    const c=data[0];const sha=c.sha.slice(0,7);
-    const date=new Date(c.commit.author.date).toISOString().slice(0,10);
-    const el=$('commit-info');
-    el.innerHTML=`<a href="${c.html_url}" target="_blank" rel="noopener" title="${c.commit.message.split('\n')[0]}">${sha}</a> · ${date}`;
-  }).catch(()=>{$('commit-info').textContent='unknown';});
+  .then(r => r.json())
+  .then(data => {
+    const c = data[0];
+    const sha = c.sha.slice(0, 7);
+    const date = new Date(c.commit.author.date).toISOString().slice(0, 10);
+    el('commit-info').innerHTML =
+      `<a href="${c.html_url}" target="_blank" rel="noopener" title="${c.commit.message.split('\n')[0]}">${sha}</a> · ${date}`;
+  })
+  .catch(() => { el('commit-info').textContent = 'unknown'; });
 </script>
 </body>
 </html>
