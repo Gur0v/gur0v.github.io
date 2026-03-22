@@ -146,6 +146,18 @@ li { margin-bottom: 1rem; }
   font-weight: 500;
 }
 
+.uses-val a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.uses-val a:hover {
+  color: #F15A22;
+  border-bottom-color: #F15A22;
+}
+
 footer {
   padding-top: 1.25rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -333,8 +345,8 @@ footer {
             <div class="uses-item"><span class="uses-label">GPU</span><span class="uses-val">AMD Radeon RX 7600</span></div>
             <div class="uses-item"><span class="uses-label">Motherboard</span><span class="uses-val">MSI B550-A PRO</span></div>
             <div class="uses-item"><span class="uses-label">Memory</span><span class="uses-val">32GB DDR4 @ 3200</span></div>
-            <div class="uses-item"><span class="uses-label">OS</span><span class="uses-val">Gentoo Linux</span></div>
-            <div class="uses-item"><span class="uses-label">Desktop</span><span class="uses-val">Qtile (XLibre)</span></div>
+            <div class="uses-item"><span class="uses-label">OS</span><span class="uses-val"><a href="https://www.gentoo.org/" target="_blank" rel="noopener">Gentoo Linux</a></span></div>
+            <div class="uses-item"><span class="uses-label">Desktop</span><span class="uses-val"><a href="https://qtile.org/" target="_blank" rel="noopener">Qtile</a> (<a href="https://xlibre.net/" target="_blank" rel="noopener">XLibre</a>)</span></div>
           </div>
         </section>
       </main>
@@ -345,6 +357,7 @@ footer {
           <span>Source under <a href="https://github.com/Gur0v/gur0v.github.io">AGPL-3.0</a></span>
         </div>
         <div class="socials">
+          <a href="https://github.com/Gur0v/dotfiles" target="_blank" rel="noopener">Dotfiles</a>
           <a href="https://github.com/Gur0v" target="_blank" rel="noopener">GitHub</a>
           <a href="https://www.last.fm/user/gur0v" target="_blank" rel="noopener">Last.fm</a>
           <a href="https://discord.com/users/507198451998523392" target="_blank" rel="noopener">Discord</a>
