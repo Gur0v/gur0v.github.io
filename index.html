@@ -115,45 +115,6 @@ li { margin-bottom: 1rem; }
   line-height: 1.55;
 }
 
-.uses-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 0.6rem;
-}
-
-.uses-item {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 6px;
-  padding: 0.65rem 0.85rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.uses-item .uses-label {
-  font-family: 'Syne', sans-serif;
-  font-weight: 600;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.uses-item .uses-val {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-}
-
-.uses-val a {
-  color: inherit;
-  text-decoration: none;
-  transition: color 0.15s;
-}
-
-.uses-val a:hover { color: #F15A22; }
-
 footer {
   padding-top: 1.25rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -332,18 +293,6 @@ footer {
               <span class="dsc">Even faster & easier package management for Arch Linux.</span>
             </li>
           </ul>
-        </section>
-
-        <section id="uses">
-          <h2>Uses</h2>
-          <div class="uses-grid">
-            <div class="uses-item"><span class="uses-label">CPU</span><span class="uses-val">AMD Ryzen 5 5600</span></div>
-            <div class="uses-item"><span class="uses-label">GPU</span><span class="uses-val">AMD Radeon RX 7600</span></div>
-            <div class="uses-item"><span class="uses-label">Motherboard</span><span class="uses-val">MSI B550-A PRO</span></div>
-            <div class="uses-item"><span class="uses-label">Memory</span><span class="uses-val">32GB DDR4 @ 3200</span></div>
-            <div class="uses-item"><span class="uses-label">OS</span><span class="uses-val"><a href="https://archlinux.org/" target="_blank" rel="noopener">Arch Linux</a></span></div>
-            <div class="uses-item"><span class="uses-label">Desktop</span><span class="uses-val"><a href="https://kde.org/" target="_blank" rel="noopener">KDE Plasma</a></span></div>
-          </div>
         </section>
       </main>
 
