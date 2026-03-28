@@ -6,7 +6,7 @@
 <title>Gurov</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&family=Syne:wght@800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -73,7 +73,7 @@ section { margin-bottom: 1.75rem; }
 h2 {
   font-family: 'Syne', sans-serif;
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 800;
   color: rgba(255, 255, 255, 0.4);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -98,7 +98,7 @@ li { margin-bottom: 1rem; }
   color: #F15A22;
   text-decoration: none;
   font-family: 'Syne', sans-serif;
-  font-weight: 600;
+  font-weight: 800;
   font-size: 0.95rem;
   display: inline-flex;
   width: fit-content;
@@ -139,7 +139,7 @@ footer {
   color: rgba(255, 255, 255, 0.4);
   text-decoration: none;
   font-family: 'Syne', sans-serif;
-  font-weight: 500;
+  font-weight: 800;
   font-size: 0.82rem;
   letter-spacing: 0.03em;
   padding: 0.3rem 0.7rem;
@@ -182,7 +182,7 @@ footer {
 #popup strong {
   display: block;
   font-family: 'Syne', sans-serif;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 0.92rem;
   color: #fff;
   margin-bottom: 0.4rem;
@@ -194,7 +194,7 @@ footer {
   color: #F15A22;
   text-decoration: none;
   font-family: 'Syne', sans-serif;
-  font-weight: 600;
+  font-weight: 800;
   font-size: 0.85rem;
   border: 1px solid rgba(241, 90, 34, 0.45);
   border-radius: 6px;
@@ -376,7 +376,7 @@ class TouchTexture {
       else this._drawPoint(p);
     }
 
-    this.texture.needsUpdate = true;
+    if (this.trail.length) this.texture.needsUpdate = true;
   }
 
   _drawPoint(p) {
@@ -562,6 +562,10 @@ const mesh = new THREE.Mesh(
   new THREE.ShaderMaterial({ uniforms, vertexShader, fragmentShader })
 );
 scene.add(mesh);
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) clock.stop(); else { clock.start(); requestAnimationFrame(tick); }
+});
 
 function tick() {
   touch.update();
